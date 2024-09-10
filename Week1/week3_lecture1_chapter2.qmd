@@ -294,3 +294,53 @@ liklihood_west_pop <- 0.294
 ```
 
 -   posterior probability model determining the probability that the person is from the south based on using the word "pop" is about 5.1%
+
+NOT CORRECT
+
+### **Pop vs Soda - In Class**
+
+Exploratory Analysis
+
+```{r}
+ggplot(data = pop_vs_soda, aes(x = region, fill = pop)) + 
+  geom_bar()
+```
+
+1\) Prior Probability (census data)
+
+```{r}
+priors <- c(
+  midwest = 0.21, 
+  northeast = 0.17, 
+  south = 0.38, 
+  west = 0.24
+)
+
+priors 
+```
+
+2\) Regional Likelihoods (survey)
+
+```{r}
+likelihoods <- pop_vs_soda %>%
+  tabyl(pop, region) %>%
+  adorn_percentages("col") %>%
+  filter(pop == TRUE) %>%
+  select(-pop) %>%
+  unlist()
+
+likelihoods
+```
+
+3\) Marginal Prior Probability that a person uses the word pop
+
+```{r}
+prior_probability_says_pop <- sum(priors * likelihoods)
+prior_probability_says_pop
+```
+
+4\) Finding our posterior probability P(S\|A)
+
+```{r}
+(priors[3] * likelihoods[3]) / prior_probability_says_pop
+```
