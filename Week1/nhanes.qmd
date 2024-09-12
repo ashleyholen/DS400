@@ -24,11 +24,11 @@ library(janitor)
 -   2017-2018_Diabetes.XPT as 'diabetes'
 
 ```{r}
-diet_behavior <- read_xpt(here("data/nhanes_data/DR1TOT_J.XPT"))
-blood_hg <- read_xpt(here("data/nhanes_data/2017-2018_Hg-Blood.XPT"))
-urine_hg <- read_xpt(here("data/nhanes_data/2017-2018_Hg-Urine.XPT"))
-diabetes <- read_xpt(here("data/nhanes_data/2017-2018_Diabetes.XPT"))
-demographics <- read_xpt(here("data/nhanes_data/2017-2018_Demographics.XPT"))
+diet_behavior <- read_xpt(here("data/nhanes_data/NSF-ALL-SPICE-Alliance DS400 main data-nhanes_data/DR1TOT_J.XPT"))
+blood_hg <- read_xpt(here("data/nhanes_data/NSF-ALL-SPICE-Alliance DS400 main data-nhanes_data/2017-2018_Hg-Blood.XPT"))
+urine_hg <- read_xpt(here("data/nhanes_data/NSF-ALL-SPICE-Alliance DS400 main data-nhanes_data/2017-2018_Hg-Urine.XPT"))
+diabetes <- read_xpt(here("data/nhanes_data/NSF-ALL-SPICE-Alliance DS400 main data-nhanes_data/2017-2018_Diabetes.XPT"))
+demographics <- read_xpt(here("data/nhanes_data/NSF-ALL-SPICE-Alliance DS400 main data-nhanes_data/2017-2018_Demographics.XPT"))
 ```
 
 ### Subset Read-in Datasets
@@ -83,12 +83,104 @@ df <- df %>%
 ```
 
 2.  Do some exploratory data analysis
-3.  Determine the prior probability that someone has diabetes (DIQ010)
-    -   P(B)
-4.  Determine the prior probability that someone eats tuna (DRD370B)
-    -   P(A)
-5.  Determine the likelihood of eating tuna and having diabetes
-    -   L(B\|A)
-6.  Determine posterior probability via bayes theorem
-    -   P(B\|A)
-7.  What other questions can we ask of this data?
+
+```{r}
+head(df)
+```
+
+```{r}
+colnames(df)
+```
+
+```{r}
+df_main <- df[, c("DIQ010", "DRD370B")]
+df_main
+```
+
+```{r}
+summary(df)
+```
+
+```{r}
+summary(df_main)
+```
+
+```{r}
+# Reshape data to long format
+df_long <- df_main %>%
+  pivot_longer(cols = c("DIQ010", "DRD370B"), names_to = "column", values_to = "response")
+
+# Create the plot with separate panels
+ggplot(df_long, aes(x = response, fill = response)) +
+  geom_bar() +
+  facet_wrap(~column) +  # This creates separate plots for each column
+  geom_text(stat = "count", aes(label = ..count..), vjust = 0) +  # Add counts on top
+  labs(title = "Yes/No Responses for DIQ010 and DRD370B", x = "Response", y = "Count") +
+  theme_minimal()
+```
+
+```{r}
+count_col1 <- table(df_main$DIQ010)
+count_col2 <- table(df_main$DRD370B)
+
+# Display counts
+count_col1
+count_col2
+```
+
+1.  Determine the prior probability that someone has diabetes (DIQ010)
+
+-   P(B) =
+
+    ```         
+    0.1287574
+    ```
+
+```{r}
+df_main %>% 
+  tabyl(DIQ010) %>% 
+  adorn_totals("row")
+```
+
+2.  Determine the prior probability that someone eats tuna (DRD370B)
+    -   P(A) =
+
+        ```         
+        0.3609467
+        ```
+
+```{r}
+df_main %>% 
+  tabyl(DRD370B) %>% 
+  adorn_totals("row")
+```
+
+3.  Determine the likelihood of eating tuna and having diabetes
+
+-   L(B\|A) =
+
+    ```{r}
+    df_main %>% 
+      tabyl(DIQ010, DRD370B) %>% 
+      adorn_percentages("row")
+
+    liklihood_of_tuna_and_diabetes = 0.3584559
+    ```
+
+4.  Determine posterior probability via bayes theorem
+
+-   P(B\|A) =
+
+```{r}
+prob_diabetes = 0.1287574
+prob_tuna = 0.3609467
+liklihood_of_tuna_and_diabetes = 0.3584559
+```
+
+```{r}
+# Calculate P(B|A): p_B_given_A <- p_A_and_B / p_A
+prob_diabetes_given_they_eat_tuna = liklihood_of_tuna_and_diabetes / prob_tuna
+prob_diabetes_given_they_eat_tuna
+```
+
+5.  What other questions can we ask of this data?
