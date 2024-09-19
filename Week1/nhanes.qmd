@@ -257,6 +257,58 @@ ggplot(nhanes_data, aes(x = RIDAGEYR, fill = DIQ010)) + geom_density(alpha = 0.5
 
 P(B\|A)
 
-B \<- has diabetes
+B \<- has diabetes (
 
 A \<- old, over 40
+
+```{r}
+nhanes_data
+```
+
+DIQ010 is diabetes column
+
+age_bracket is age over 40
+
+Bayes Theorem
+
+P(B\|A) = P(B) L(B\|A) / P(A)
+
+B \<- has diabetes
+
+A \<- over 40
+
+```{r}
+nhanes_data %>%
+  tabyl(DIQ010)
+```
+
+```{r}
+probability_has_diabetes <- 0.13
+```
+
+```{r}
+nhanes_data %>%
+  tabyl(age_bracket, DIQ010) %>%
+  adorn_percentages("col")
+```
+
+```{r}
+probability_is_old_given_diabetes <- 0.96
+```
+
+```{r}
+nhanes_data %>% 
+  tabyl(age_bracket)
+```
+
+```{r}
+probability_is_old <- 0.53
+```
+
+P(B\|A) \<- probability someone has diabetes given they are "old" (over 40)
+
+```{r}
+(probability_has_diabetes * probability_is_old_given_diabetes / probability_is_old)
+```
+
+**P(B\|A) = 0.24**
