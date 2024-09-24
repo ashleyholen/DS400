@@ -1,0 +1,132 @@
+---
+title: "Test Results"
+format: html
+editor: visual
+---
+
+#### Load Libraries
+
+```{r, message=FALSE}
+library(tidyverse)
+library(janitor)
+library(vembedr)
+```
+
+#### The Story
+
+You test positive for a rare disease that only effects 0.001 (One in one thousand people).
+
+So you ask the doctor:
+
+-   How certain is it that I have this disease?
+
+    -   The test correctly identifies 99% of people that have the disease and only incorrectly identifies 1% of people that don't have the disease
+
+What are the chances that you actually have this disease?
+
+-   Some would say 99%, the accuracy of the test
+
+    -   What does bayes say?
+
+$$
+P(B \mid A) = \frac{P(B) L(B \mid A)}{P(A)} 
+$$
+
+B \<- Has Disease
+
+A \<- Positive test result
+
+P(B\|A) - The probability of having the disease given a positive test result
+
+#### Simulate the Data
+
+```{r}
+
+set.seed(70)  # For reproducibility
+
+# Parameters
+n_patients <- 10000  # Total population size
+n_diseased <- 10     # Number of patients with the disease
+sensitivity <- 0.99  # True positive rate (sensitivity)
+false_positive_rate <- 0.01  # False positive rate
+
+# Step 1: Create the DataFrame with patients
+patients <- data.frame(
+  patient_id = 1:n_patients,
+  has_disease = c(rep(1, n_diseased), rep(0, n_patients - n_diseased))  # 10 with the disease, rest without
+)
+
+# Shuffle the DataFrame to randomize patient order
+patients <- patients %>%
+  sample_frac(size = 1)
+
+# Step 2: Simulate the test results based on disease status
+patients <- patients %>%
+  mutate(
+    # Test result is positive if the person has the disease and the test is sensitive,
+    # or if they don't have the disease but it's a false positive
+    test_result = case_when(
+      has_disease == 1 & rbinom(n_patients, size = 1, prob = sensitivity) == 1 ~ "positive",
+      has_disease == 0 & rbinom(n_patients, size = 1, prob = false_positive_rate) == 1 ~ "positive",
+      TRUE ~ "negative"
+    )
+  )
+
+
+
+
+```
+
+#### Apply Bayes Theorem in Class
+
+is positive given a positive test
+
+B = has disease
+
+A = test result
+
+```{r}
+patients %>%
+  tabyl(has_disease)
+```
+
+```{r}
+probability_has_disease <- 0.001
+```
+
+```{r}
+patients %>%
+  tabyl(has_disease, test_result) %>%
+  adorn_percentages("row")
+```
+
+```{r}
+probability_positive_test_given_disease <- 1
+```
+
+```{r}
+patients %>% 
+  tabyl(test_result)
+```
+
+```{r}
+probabilty_postive_test <- 0.011
+```
+
+```{r}
+(probability_has_disease * probability_positive_test_given_disease / probabilty_postive_test)
+```
+
+#### Video
+
+```{r}
+embed_url("https://www.youtube.com/watch?v=R13BD8qKeTg")
+```
+
+#### What about two positive test results?
+
+$$
+P(\text{have disease} \mid \text{positive second test}) = \frac{P(\text{have disease after first positive}) \cdot P(\text{positive second test} \mid \text{have disease})}{P(\text{positive second test})}
+$$
+
+After watching the provided video, I have reflected on a scenario in which a second positive test was taken. When initially thinking of this problem strictly logically, I would assume that this would increase the probability of having the disease. I am unsure if this is correct, but looking at the above equation, my first instinct would be that P(have disease after positive) is the same as the result that we found above using Bayes Theorem, of about 9%. Using this result as a prior probability sets us up to be able to go through Bayes Theorem again, this time looking if the patient received a second positive test. It is important to note if second positive test means that the positive had to have followed an initial positive, or what happens if the first is negative and the second is positive. After having our prior, we can then find the probability of a second positive test given that the patient has the disease, and the probability of a second positive test, plug them all into the Bayes Theorem, and calculate. We would have to first of all find the data for a second positive test.
