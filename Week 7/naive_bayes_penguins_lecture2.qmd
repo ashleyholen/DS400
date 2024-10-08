@@ -274,14 +274,14 @@ probs_gentoo <- (124/342) * 0.0001767016 * 0.09327439 * 0.0483871
 probs_gentoo
 ```
 
-#### Sum of Probabilities 
+#### Sum of Probabilities
 
 ```{r}
 sum_of_probs <- probs_adelie + probs_chinstrap + probs_gentoo
 sum_of_probs
 ```
 
-#### Probability Chinstrap 
+#### Probability Chinstrap
 
 ```{r}
 probs_chinstrap / sum_of_probs
