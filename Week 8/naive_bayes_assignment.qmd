@@ -307,7 +307,7 @@ fake_news %>%
   adorn_ns
 ```
 
-**It can be seen that when incorporating all variables, the performance of the model greatly improves.** \
+**It can be seen that when incorporating all variables, the performance of the model greatly improves.**\
 \
 
 ```{r}

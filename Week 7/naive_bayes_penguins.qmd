@@ -15,7 +15,7 @@ library(e1071)
 
 ### Story
 
-We’ll start our naive Bayes classification with just a single penguin. Suppose an Antarctic researcher comes across a penguin that weighs less than 4200g with a 195mm-long flipper and 50mm-long bill. Our goal is to help this researcher identify the species of this penguin, Adelie, Chinstrap, or Gentoo.
+We'll start our naive Bayes classification with just a single penguin. Suppose an Antarctic researcher comes across a penguin that weighs less than 4200g with a 195mm-long flipper and 50mm-long bill. Our goal is to help this researcher identify the species of this penguin, Adelie, Chinstrap, or Gentoo.
 
 #### Let's Plot!
 
@@ -35,6 +35,8 @@ head(penguins)
 ```
 
 The first thing that comes to mind when identifying a species is the creation of a decision tree, but this would require machine learning. So, I must think of a more simple visualization that completes a similar task.
+
+ggplot(data = penguins, aes(x = above_average_weight, fill = species))
 
 ```{r}
 ggplot(data = penguins, aes(x = above_average_weight, fill = species)) +
