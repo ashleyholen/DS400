@@ -1,0 +1,109 @@
+---
+title: "Spam Classification Ashley"
+format: html
+editor: visual
+---
+
+## Libraries
+
+```{r, message = FALSE}
+library(bayesrules)
+library(tidyverse)
+library(e1071)
+library(janitor)
+library(shiny)
+library(bslib)
+library(here)
+library(tm)
+library(wordcloud)
+```
+
+## Data
+
+```{r}
+data <- read.table(file= here("~/Desktop/Bayesian Stats/DS400/Final/SMSSpamCollection"), sep="\t", quote="", comment.char="")
+```
+
+## Cleaning
+
+```{r}
+head(data)
+```
+
+```{r}
+colnames(data)
+```
+
+```{r}
+colnames(data) <- c("type", "message")
+colnames(data)
+```
+
+```{r}
+head(data)
+```
+
+## Exploration
+
+```{r}
+ggplot(data = data, aes(x = type, fill = type)) + 
+  geom_bar()
+```
+
+```{r}
+count_exclamations <- sum(grepl("!", data$message))
+count_exclamations
+```
+
+```{r}
+data$has_exclamation <- ifelse(grepl("!", data$message), "yes", "no")
+```
+
+```{r}
+ggplot(data, aes(x = type, fill = has_exclamation)) + 
+  geom_bar()
+```
+
+Ham Word Cloud
+
+```{r, warning=FALSE}
+# Subset the data for 'ham' messages
+ham_messages <- subset(data, type == "ham")$message
+
+# Create a text corpus for 'ham' messages
+ham_corpus <- Corpus(VectorSource(ham_messages))
+
+# Clean the text: remove punctuation, stopwords, and convert to lowercase
+ham_corpus <- tm_map(ham_corpus, content_transformer(tolower))
+ham_corpus <- tm_map(ham_corpus, removePunctuation)
+ham_corpus <- tm_map(ham_corpus, removeWords, stopwords("english"))
+ham_corpus <- tm_map(ham_corpus, stripWhitespace)
+
+# Create word cloud for 'ham' messages
+wordcloud(ham_corpus, max.words = 120, random.order = FALSE, colors = brewer.pal(8, "Dark2"), main = "Ham Messages")
+```
+
+Spam Word Cloud
+
+```{r, warning=FALSE}
+# Subset the data for 'spam' messages
+spam_messages <- subset(data, type == "spam")$message
+
+# Create a text corpus for 'spam' messages
+spam_corpus <- Corpus(VectorSource(spam_messages))
+
+# Clean the text: remove punctuation, stopwords, and convert to lowercase
+spam_corpus <- tm_map(spam_corpus, content_transformer(tolower))
+spam_corpus <- tm_map(spam_corpus, removePunctuation)
+spam_corpus <- tm_map(spam_corpus, removeWords, stopwords("english"))
+spam_corpus <- tm_map(spam_corpus, stripWhitespace)
+
+# Create word cloud for 'spam' messages with standard Reds palette
+wordcloud(spam_corpus, max.words = 100, random.order = FALSE, colors = brewer.pal(8, "Reds"), main = "Spam Messages")
+```
+
+## Bayes
+
+```{r}
+
+```
